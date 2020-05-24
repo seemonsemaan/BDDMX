@@ -8,12 +8,12 @@
  *
  * @author Seemon
  */
-public class ColorRecurrence {
+public class ColorRecurrence implements Comparable<ColorRecurrence> {
 
-    private int recurrence;
+    private Integer recurrence;
     private String colorName;
 
-    public int getRecurrence() {
+    public Integer getRecurrence() {
         return recurrence;
     }
 
@@ -39,4 +39,8 @@ public class ColorRecurrence {
         return colorName + ": " + recurrence;
     }
 
+    @Override
+    public int compareTo(ColorRecurrence t) {
+        return this.getRecurrence().compareTo(t.getRecurrence());
+    }
 }

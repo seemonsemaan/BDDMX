@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -30,7 +32,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
     }
 
-    String imagePath;
+    String imagePath = null;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -73,7 +75,7 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chooseImage)
                             .addComponent(colorDetection))
-                        .addGap(0, 271, Short.MAX_VALUE)))
+                        .addGap(0, 657, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -84,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(11, 11, 11)
                 .addComponent(colorDetection)
                 .addGap(18, 18, 18)
-                .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -101,6 +103,10 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_chooseImageActionPerformed
 
     private void colorDetectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorDetectionActionPerformed
+        if (imagePath == null) {
+            JOptionPane.showMessageDialog(this, "Choose image first");
+            return;
+        }
         try {
             // TODO add your handling code here:
             BufferedImage image;
@@ -132,11 +138,12 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                 }
             }
+            Collections.sort(colorReccurenceList, Collections.reverseOrder());
             int totalPixel = width * height;
             String result = "";
             for (ColorRecurrence obj : colorReccurenceList) {
                 int r = obj.getRecurrence();
-                float rec = (r / (float)totalPixel * 100);
+                float rec = (r / (float) totalPixel * 100);
                 result += obj.getColor() + ": " + new DecimalFormat("##.##").format(rec) + "%\n";
             }
             new ColorDetection(result).setVisible(true);

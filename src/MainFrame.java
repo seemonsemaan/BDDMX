@@ -46,6 +46,7 @@ public class MainFrame extends javax.swing.JFrame {
         chooseImage = new javax.swing.JButton();
         imageLabel = new javax.swing.JLabel();
         colorDetection = new javax.swing.JButton();
+        skinDetection = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -63,6 +64,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        skinDetection.setText("Skin Detection");
+        skinDetection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                skinDetectionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -72,10 +80,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chooseImage)
-                            .addComponent(colorDetection))
-                        .addGap(0, 657, Short.MAX_VALUE)))
+                        .addComponent(chooseImage)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(colorDetection)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 343, Short.MAX_VALUE)
+                        .addComponent(skinDetection)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -84,9 +94,11 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(chooseImage)
                 .addGap(11, 11, 11)
-                .addComponent(colorDetection)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(colorDetection)
+                    .addComponent(skinDetection))
                 .addGap(18, 18, 18)
-                .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -152,6 +164,42 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_colorDetectionActionPerformed
 
+    private void skinDetectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_skinDetectionActionPerformed
+        try {
+            if (imagePath == null) {
+                JOptionPane.showMessageDialog(this, "Choose image first");
+                return;
+            }
+            // TODO add your handling code here:
+            BufferedImage image;
+            image = ImageIO.read(new File(imagePath));
+            int width = image.getWidth();
+            int height = image.getHeight();
+
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    Color color = new Color(image.getRGB(j, i));
+                    float[] hsv = new float[3];
+                    Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsv);
+                    if (hsv[0] >= 0 && hsv[0] <= 50 && hsv[1] >= 0.23
+                            && hsv[1] <= 0.68 && color.getRed() > 95 && color.getGreen() > 40
+                            && color.getBlue() > 20 && color.getRed() > color.getGreen()
+                            && color.getRed() > color.getBlue()
+                            && Math.abs(color.getRed() - color.getGreen()) > 15
+                            && color.getAlpha() > 15) {
+                    } else {
+                        image.setRGB(j, i, Color.BLACK.getRGB());
+                    }
+                }
+            }
+            File f = new File("C:\\Users\\Seemon\\Desktop\\Skin.jpg");
+            ImageIO.write(image, "jpg", f);
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_skinDetectionActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -193,5 +241,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton chooseImage;
     private javax.swing.JButton colorDetection;
     private javax.swing.JLabel imageLabel;
+    private javax.swing.JButton skinDetection;
     // End of variables declaration//GEN-END:variables
 }

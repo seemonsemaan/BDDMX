@@ -192,8 +192,49 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                 }
             }
-            File f = new File("C:\\Users\\Seemon\\Desktop\\Skin.jpg");
+            String skinPath = "C:\\Users\\Seemon\\Desktop\\Skin.jpg";
+            File f = new File(skinPath);
+            
             ImageIO.write(image, "jpg", f);
+            image = ImageIO.read(f);
+            width = image.getWidth();
+            height = image.getHeight();
+            float cmax = 0, cmin = 255, m = 0;
+            float s = 0;
+            int dark = 0, light = 0;
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int rgb = image.getRGB(j, i);
+                    float a = (rgb >> 24) & 0xff;
+                    float r = (rgb >> 16) & 0xFF;
+                    float g = (rgb >> 8) & 0xFF;
+                    float b = (rgb) & 0xFF;
+
+                    if (r != 0 || g != 0 || b != 0) {
+                        cmax = Math.max(cmax, Math.max(r, Math.max(g, b)));
+                        cmin = Math.min(cmax, Math.min(r, Math.min(g, b)));
+                        m = cmax - cmin;
+                        if (cmax != 0) {
+                            s = m / cmax;
+                            if (s >= 0.68) {
+                                dark++;
+                            } else {
+                                light++;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            String result = "";
+
+            if (dark > light) {
+                result += "Dark skin";
+            } else {
+                result += "Light skin";
+            }
+
+            new SkinDetection(skinPath, result).setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }

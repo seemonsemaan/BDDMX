@@ -13,6 +13,10 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -47,6 +51,7 @@ public class MainFrame extends javax.swing.JFrame {
         imageLabel = new javax.swing.JLabel();
         colorDetection = new javax.swing.JButton();
         skinDetection = new javax.swing.JButton();
+        genderDetection = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,6 +76,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        genderDetection.setText("Gender Detection");
+        genderDetection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                genderDetectionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -84,7 +96,9 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(colorDetection)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 343, Short.MAX_VALUE)
+                        .addGap(110, 110, 110)
+                        .addComponent(genderDetection)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
                         .addComponent(skinDetection)))
                 .addContainerGap())
         );
@@ -96,7 +110,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(colorDetection)
-                    .addComponent(skinDetection))
+                    .addComponent(skinDetection)
+                    .addComponent(genderDetection))
                 .addGap(18, 18, 18)
                 .addComponent(imageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
                 .addContainerGap())
@@ -194,7 +209,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
             String skinPath = "C:\\Users\\Seemon\\Desktop\\Skin.jpg";
             File f = new File(skinPath);
-            
+
             ImageIO.write(image, "jpg", f);
             image = ImageIO.read(f);
             width = image.getWidth();
@@ -225,7 +240,7 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                 }
             }
-            
+
             String result = "";
 
             if (dark > light) {
@@ -240,6 +255,54 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_skinDetectionActionPerformed
+
+    private void genderDetectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genderDetectionActionPerformed
+        try {
+            // TODO add your handling code here:
+            if (imagePath == null) {
+                JOptionPane.showMessageDialog(this, "Choose image first");
+                return;
+            }
+            System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
+            WeightedStandardPixelTrainer weightedStandardPixelTrainer = new WeightedStandardPixelTrainer();
+
+            String imageFilePath = "src/res/sample/sample.jpg";
+
+            File f = new File(imagePath);
+            File newFile = new File(imageFilePath);
+            BufferedImage originalImage = ImageIO.read(f);
+
+            ImageIO.write(originalImage, "jpg", newFile);
+
+            Mat[] faces = new FaceDetector().snipFace(imagePath, new Size(90, 90));
+
+//experience file
+            weightedStandardPixelTrainer.load("src/res/knowledge/Knowledge.log");
+            String result = "";
+            int faceNo = 1;
+            for (Mat face : faces) {
+
+                int prediction = weightedStandardPixelTrainer.predict(face);
+
+                if (prediction == -1) {
+                    result += ("I think " + faceNo + " is not a face.");
+                    Highgui.imwrite("src/res/sample/" + faceNo + "_noface.jpg", face);
+                } else if (prediction == 0) {
+                    result += ("I think " + faceNo + " is a female.");
+                    Highgui.imwrite("src/res/sample/" + faceNo + "_female.jpg", face);
+                } else {
+                    result += ("I think " + faceNo + " is a male.");
+                    Highgui.imwrite("src/res/sample/" + faceNo + "_male.jpg", face);
+                }
+
+                faceNo++;
+            }
+            new GenderDetection(result);
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_genderDetectionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -281,6 +344,7 @@ public class MainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseImage;
     private javax.swing.JButton colorDetection;
+    private javax.swing.JButton genderDetection;
     private javax.swing.JLabel imageLabel;
     private javax.swing.JButton skinDetection;
     // End of variables declaration//GEN-END:variables
